@@ -158,9 +158,16 @@ def generate_random_doc(format):
     res = {}
 
     for f in format:
-        f_key, f_val = get_data_for_format(f)
+        nested_keys = f.split('::')
+        f_key, f_val = get_data_for_format(nested_keys[-1])
         if f_key:
-            res[f_key] = f_val
+            if len(nested_keys) > 1:
+                nested_prop = {f_key: f_val}
+                for key in reversed(nested_keys[1:-1]):
+                    nested_prop = {key: nested_prop}
+                res[nested_keys[0]] = nested_prop
+            else:
+                res[f_key] = f_val
 
     if not tornado.options.options.id_type:
         return res
